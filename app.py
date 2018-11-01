@@ -1,7 +1,6 @@
 """Main Chalice File"""
 
 import logging
-from sqlalchemy import create_engine
 from chalice import Chalice
 from chalicelib import execute
 
