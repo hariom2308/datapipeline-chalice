@@ -1,0 +1,19 @@
+{
+  "version": "2.0",
+  "app_name": "datapipeline-chalice",
+  "stages": {
+    "dev": {
+      "api_gateway_stage": "api",
+      "autogen_policy": false,
+      "iam_policy_file": "policy-dev.json",
+      "subnet_ids": ["subnet-83ff35d9", "subnet-7be46c1d", "subnet-9077efd8"],
+      "security_group_ids": ["sg-abd654d7"],
+      "lambda_timeout": 180,
+      "environment_variables": {
+                "SECRETNAME": "lambda/datapipeline-chalice/analyst/staging",
+                "AWSREGION": "eu-west-1",
+                "S3BUCKET": "hom-onboarding"
+            }
+    }
+  }
+}
