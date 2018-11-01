@@ -82,6 +82,4 @@ class RevenueReport(BaseRevenueReport):
         file_name = 'Reports/revenueReport' + time.strftime("%Y%m%d-%H%M%S") + '.csv'
         data = self.merged_df.to_csv(None)
         s3 = boto3.client('s3')
-        #s3_resource = aws_resource.connect_to_s3()
-        #s3_resource.Bucket('hom-onboarding').put_object(Key=file_name, Body=data)
         s3.put_object(Bucket=bucket, Key=file_name, Body=data)
