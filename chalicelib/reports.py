@@ -3,7 +3,6 @@ import pandas as pd
 import boto3
 import re
 from sqlalchemy import create_engine
-
 import time
 from chalicelib import utilities, secretsmanager
 
@@ -14,13 +13,13 @@ class BaseRevenueReport(ABC):
         self.dataframe = None
         self.engine = None
 
-    @utilities.check_exceptions
+    @utilities.logs_decorator
     def load_from_csv(self, bucket, key):
         s3 = boto3.client('s3')
         obj = s3.get_object(Bucket=bucket, Key=key)
         self.dataframe = pd.read_csv(obj['Body'])
 
-    @utilities.check_exceptions
+    @utilities.logs_decorator
     def sql_connect_and_create_engine(self):
         credentials = secretsmanager.get_secret()
         server = f"mysql+pymysql://{credentials['USER']}:{credentials['PASSWORD']}@{credentials['HOST']}:{credentials['PORT']}/{credentials['SCHEMA']}"
@@ -39,11 +38,11 @@ class RevenueReport(BaseRevenueReport):
         self.sql_df = None
         self.merged_df = None
 
-    @utilities.check_exceptions
+    @utilities.logs_decorator
     def google_play_order_ids(self):
         return tuple(list(self.dataframe['google_play_order_id']))
 
-    @utilities.check_exceptions
+    @utilities.logs_decorator
     def transform_csv_df(self):
         df = self.dataframe
         df = df[df['Buyer Currency'] == 'EUR']
@@ -55,7 +54,7 @@ class RevenueReport(BaseRevenueReport):
                                                         axis=1)
         self.dataframe = df
 
-    @utilities.check_exceptions
+    @utilities.logs_decorator
     def load_from_sql(self, list_of_google_id):
         sql = f"""
             SELECT min(created_at) AS registration_date, google_play_order_id
@@ -67,7 +66,7 @@ class RevenueReport(BaseRevenueReport):
         self.sql_connect_and_create_engine()
         self.sql_df = pd.read_sql_query(sql, self.engine)
 
-    @utilities.check_exceptions
+    @utilities.logs_decorator
     def transform_sql_df(self):
         df2 = self.sql_df
         self.merged_df = pd.merge(self.dataframe, df2, on=['google_play_order_id'], how='left')
@@ -77,7 +76,7 @@ class RevenueReport(BaseRevenueReport):
                                                             else 0.1 * x['Merchant Amount'], axis=1)
         self.merged_df = self.merged_df[__class__.columns_final]
 
-    @utilities.check_exceptions
+    @utilities.logs_decorator
     def dataframe_to_s3(self, bucket):
         file_name = 'Reports/revenueReport' + time.strftime("%Y%m%d-%H%M%S") + '.csv'
         data = self.merged_df.to_csv(None)

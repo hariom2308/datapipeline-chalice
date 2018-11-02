@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@utilities.check_exceptions
+@utilities.logs_decorator
 def executor(name_of_report, bucket, key):
     try:
         report = getattr(reports, name_of_report)()
@@ -19,7 +19,7 @@ def executor(name_of_report, bucket, key):
         logger.error(e.args[0])
 
 
-@utilities.check_exceptions
+@utilities.logs_decorator
 def select_report(num):
     reports_mapping = {'1': "RevenueReport", '2': "SalesReport"}
     if num in reports_mapping.keys():

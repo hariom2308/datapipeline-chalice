@@ -7,7 +7,8 @@ app = Chalice(app_name='datapipeline-chalice')
 logger = app.log
 logger.setLevel(logging.DEBUG)
 
-def check_exceptions(func):
+
+def logs_decorator(func):
         @wraps(func)
         def decor(*args, **kwargs):
             logger.info(
