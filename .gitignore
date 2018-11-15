@@ -4,3 +4,5 @@ chalicelib/__pycache__/
 chalicelib/.DS_Store
 __pycache__/
 .DS_Store
+.idea/
+chalicelib/.pytest_cache/
